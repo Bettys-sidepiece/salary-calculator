@@ -18,11 +18,12 @@ This project is built as a **core domain application**, with future plans to int
 ## 🧱 Project Structure
 
 ```
-src/main/java/com/example/salary/
+src/main/java/
 ├── model/      # Domain objects (IncomeProfile, TaxBreakdown, enums)
 ├── service/    # Orchestration logic
 ├── tax/        # Tax calculation strategies
 ├── ui/         # CLI interface
+└── SalaryCalculatorApp.java  # Main entry point
 ```
 
 ---
