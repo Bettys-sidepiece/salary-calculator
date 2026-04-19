@@ -58,7 +58,7 @@ public final class IncomeProfile {
         }
 
         BigDecimal grossAnnual = MoneyUtils.scale(hourlyRate.multiply(hoursPerWeek).multiply(BigDecimal.valueOf(52)));
-        return new IncomeProfile(grossAnnual, preTaxDeductions, studentLoanPlan, TaxYear.getTaxYear());
+        return new IncomeProfile(grossAnnual, preTaxDeductions, studentLoanPlan, TaxYear.uk2026());
     }
 
     public BigDecimal getGrossAnnual(){
