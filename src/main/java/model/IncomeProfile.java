@@ -3,42 +3,52 @@ package model;
 import java.math.BigDecimal;
 import java.util.Objects;
 
+import tax.TaxYear;
+import util.MoneyUtils;
+
 public final class IncomeProfile {
 
     private final BigDecimal grossAnnual;
-    private final BigDecimal pensionContribution;
+    private final BigDecimal preTaxDeductions;
     private final StudentLoanPlan studentLoanPlan;
+    private final TaxYear taxYear;
 
     public IncomeProfile (BigDecimal grossAnnual, 
-        BigDecimal pensionContribution, 
-        StudentLoanPlan studentLoanPlan) {
+        BigDecimal preTaxDeductions, 
+        StudentLoanPlan studentLoanPlan, 
+        TaxYear taxYear) {
 
             Objects.requireNonNull(grossAnnual, "Gross annual income cannot be null");
-            Objects.requireNonNull(pensionContribution, "Pension contribution cannot be null");
+            Objects.requireNonNull(preTaxDeductions, "Pre-tax deductions cannot be null");
             Objects.requireNonNull(studentLoanPlan, "Student loan repayment cannot be null");
+            Objects.requireNonNull(taxYear, "Tax year cannot be null");
 
             if (grossAnnual.compareTo(BigDecimal.ZERO) <= 0) {
-                throw new IllegalArgumentException("Gross annual income cannot be negative");
+                throw new IllegalArgumentException("Gross annual income must be positive");
             }
             
-            if (pensionContribution.compareTo(BigDecimal.ZERO) < 0){
-                throw new IllegalArgumentException("Pension Contribition must be 0.0 or greater");
+            if (preTaxDeductions.compareTo(BigDecimal.ZERO) < 0){
+                throw new IllegalArgumentException("Pre-tax deductions must be 0.0 or greater");
             }
 
-            if (pensionContribution.compareTo(grossAnnual) > 0){
-                throw new IllegalArgumentException("Pension Contribition can not be greater than GrossAnnual");
+            if (preTaxDeductions.compareTo(grossAnnual) > 0){
+                throw new IllegalArgumentException("Pre-tax deductions cannot be greater than Gross Annual");
             }
 
-            this.grossAnnual = grossAnnual;
-            this.pensionContribution = pensionContribution;
+            this.grossAnnual = MoneyUtils.scale(grossAnnual);
+            this.preTaxDeductions = MoneyUtils.scale(preTaxDeductions);
             this.studentLoanPlan = studentLoanPlan;
+            this.taxYear = taxYear;
     }
 
-    public static IncomeProfile HoursWorked(BigDecimal hourlyRate, BigDecimal hoursPerWeek, StudentLoanPlan studentLoanPlan, BigDecimal pensionContribution){
+    public static IncomeProfile HoursWorked(BigDecimal hourlyRate,
+                BigDecimal hoursPerWeek,
+                StudentLoanPlan studentLoanPlan,
+                BigDecimal preTaxDeductions){
         Objects.requireNonNull(hourlyRate, "Hourly rate cannot be null");
         Objects.requireNonNull(hoursPerWeek, "Hours per week cannot be null");
         Objects.requireNonNull(studentLoanPlan, "Student loan repayment cannot be null");
-        Objects.requireNonNull(pensionContribution, "Pension contribution cannot be null");
+        Objects.requireNonNull(preTaxDeductions, "Pre-tax deductions cannot be null");
 
         if (hourlyRate.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Hourly rate must be positive");
@@ -47,19 +57,23 @@ public final class IncomeProfile {
             throw new IllegalArgumentException("Hours per week must be positive");
         }
 
-        BigDecimal grossAnnual = hourlyRate.multiply(hoursPerWeek).multiply(BigDecimal.valueOf(52));
-        return new IncomeProfile(grossAnnual, pensionContribution, studentLoanPlan);
+        BigDecimal grossAnnual = MoneyUtils.scale(hourlyRate.multiply(hoursPerWeek).multiply(BigDecimal.valueOf(52)));
+        return new IncomeProfile(grossAnnual, preTaxDeductions, studentLoanPlan, TaxYear.getTaxYear());
     }
 
-    public BigDecimal getBigDecimal(){
+    public BigDecimal getGrossAnnual(){
         return grossAnnual;
     }
 
-    public BigDecimal getPensionContribution(){
-        return pensionContribution;
+    public BigDecimal getPreTaxDeductions(){
+        return preTaxDeductions;
     }
 
     public StudentLoanPlan getStudentLoanPlan(){
         return this.studentLoanPlan;
+    }
+
+    public TaxYear getTaxYear(){
+        return this.taxYear;
     }
 }

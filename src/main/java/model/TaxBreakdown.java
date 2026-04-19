@@ -3,6 +3,8 @@ package model;
 import java.math.BigDecimal;
 import java.util.Objects;
 
+import util.MoneyUtils;
+
 /**
  * Represents a breakdown of tax and deductions for a given gross annual income.
  * This class is immutable and thread-safe.
@@ -96,9 +98,6 @@ public final class TaxBreakdown {
             if (taxFreeAllowanceRemaining.compareTo(BigDecimal.ZERO) < 0) {
                 throw new IllegalArgumentException("Tax free allowance remaining cannot be negative");
             }
-            if (effectiveTaxRate.compareTo(BigDecimal.ZERO) < 0 || effectiveTaxRate.compareTo(BigDecimal.ONE) > 0) {
-                throw new IllegalArgumentException("Effective tax rate must be between 0 and 1");
-            }
 
             if(incomeTax.add(nationalInsurance)
                     .add(studentLoanRepayment)
@@ -120,18 +119,18 @@ public final class TaxBreakdown {
                 throw new IllegalArgumentException("Net annual income must be equal to gross annual income minus deductions");
             }
         
-            this.grossAnnual = grossAnnual;
-            this.basictax = incomeTax;
-            this.nationalInsurance = nationalInsurance;
-            this.studentLoanRepayment = studentLoanRepayment;
-            this.netAnnual = netAnnual;
-            this.pensionContribution = pensionContribution;
-            this.totalDeductions = totalDeductions;
-            this.taxableIncome = taxableIncome;
-            this.taxFreeAllowance = taxFreeAllowance;
-            this.taxFreeAllowanceUsed = taxFreeAllowance.subtract(taxFreeAllowanceRemaining);
-            this.taxFreeAllowanceRemaining = taxFreeAllowanceRemaining;
-            this.effectiveTaxRate = effectiveTaxRate;
+            this.grossAnnual = MoneyUtils.scale(grossAnnual);
+            this.basictax = MoneyUtils.scale(incomeTax);
+            this.nationalInsurance = MoneyUtils.scale(nationalInsurance);
+            this.studentLoanRepayment = MoneyUtils.scale(studentLoanRepayment);
+            this.netAnnual = MoneyUtils.scale(netAnnual);
+            this.pensionContribution = MoneyUtils.scale(pensionContribution);
+            this.totalDeductions = MoneyUtils.scale(totalDeductions);
+            this.taxableIncome = MoneyUtils.scale(taxableIncome);
+            this.taxFreeAllowance = MoneyUtils.scale(taxFreeAllowance);
+            this.taxFreeAllowanceUsed = MoneyUtils.scale(taxFreeAllowance.subtract(taxFreeAllowanceRemaining));
+            this.taxFreeAllowanceRemaining = MoneyUtils.scale(taxFreeAllowanceRemaining);
+            this.effectiveTaxRate = MoneyUtils.scale(effectiveTaxRate);
     }
 
     public BigDecimal getGrossAnnual(){
