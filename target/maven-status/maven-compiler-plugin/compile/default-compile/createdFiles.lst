@@ -1,9 +1,0 @@
-tax/TaxStrategy.class
-model/PayPeriod.class
-model/IncomeProfile.class
-util/MoneyUtils.class
-model/TaxBreakdown.class
-model/StudentLoanPlan.class
-tax/TaxYear.class
-model/IncomeContext.class
-SalaryCalculatorApp.class
