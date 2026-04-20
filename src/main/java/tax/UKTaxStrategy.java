@@ -24,6 +24,13 @@ public class UKTaxStrategy implements TaxStrategy {
     }
 
     @Override
+    /**
+     * Calculates the tax breakdown for a given income profile based on the UK tax rules.
+     * This includes calculating the personal allowance (with withdrawal), income tax, national insurance, and
+     * student loan deductions.
+     * @param profile The income profile containing salary and deduction information.
+     * @return The tax breakdown for the given income profile.
+     */
     public TaxBreakdown calculateTax(IncomeProfile profile) {
         Objects.requireNonNull(profile, "Income profile cannot be null");
         
@@ -65,7 +72,11 @@ public class UKTaxStrategy implements TaxStrategy {
             allowanceRemaining, 
             effectiveTaxRate);
     }
-
+    /**
+     * Calculates the personal allowance after considering the withdrawal threshold.
+     * @param gross The gross annual income.
+     * @return The remaining personal allowance after withdrawal.
+     */
     private BigDecimal calculateAllowanceAfterWithdrawal(BigDecimal gross) {
         BigDecimal threshold = taxYear.getAllowanceWithdrawalThreshold();
         
@@ -87,6 +98,11 @@ public class UKTaxStrategy implements TaxStrategy {
         return allowanceRemaining;
     }
 
+    /**
+     * Calculates the income tax based on the taxable income and the tax bands for the year.
+     * @param taxableIncome The taxable income after deductions and allowances.
+     * @return The calculated income tax.
+     */
     private BigDecimal calculateIncomeTax(BigDecimal taxableIncome) {
         if (taxableIncome.compareTo(BigDecimal.ZERO) <= 0) {
             return BigDecimal.ZERO;
@@ -121,6 +137,11 @@ public class UKTaxStrategy implements TaxStrategy {
         return tax;
     }
 
+    /**
+     * Calculates the national insurance contribution based on the gross income.
+     * @param gross The gross annual income.
+     * @return The calculated national insurance contribution.
+     */
     private BigDecimal calculateNationalInsurance(BigDecimal gross) {
         BigDecimal threshold = BigDecimal.valueOf(12570); // 2026/27 NI threshold
         BigDecimal afterThreshold = gross.subtract(threshold);
@@ -131,7 +152,12 @@ public class UKTaxStrategy implements TaxStrategy {
         
         return MoneyUtils.scale(afterThreshold.multiply(BigDecimal.valueOf(0.08)));
     }
-
+    /**
+     * Calculates the student loan repayment based on the gross income and the specified student loan plan.
+     * @param gross The gross annual income.
+     * @param plan The student loan plan to use for calculation.
+     * @return The calculated student loan repayment.
+     */
     private BigDecimal calculateStudentLoan(BigDecimal gross, model.StudentLoanPlan plan) {
         BigDecimal threshold = plan.getThreshold();
         BigDecimal afterThreshold = gross.subtract(threshold);

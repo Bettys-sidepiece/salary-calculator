@@ -3,7 +3,8 @@ package model;
 import java.math.BigDecimal;
 
 public enum PayPeriod {
-    // HOURLY: Use IncomeProfile.HoursWorked() instead - hours per week varies per person
+    HOURLY(null), // Hourly pay doesn't have a fixed number of periods per year
+    DAILY(null), // Daily pay doesn't have a fixed number of periods per year
     WEEKLY(BigDecimal.valueOf(52)),
     FORTNIGHTLY(BigDecimal.valueOf(26)),
     MONTHLY(BigDecimal.valueOf(12)),
