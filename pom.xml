@@ -3,62 +3,81 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
                              http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <!-- Maven model version -->
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- Project identity -->
-    <groupId>salary.calculator</groupId> <!-- your namespace -->
-    <artifactId>salary-calculator</artifactId> <!-- project name -->
-    <version>1.0-SNAPSHOT</version> <!-- dev version -->
+    <groupId>salary.calculator</groupId>
+    <artifactId>salary-calculator</artifactId>
+    <version>1.0-SNAPSHOT</version>
 
-    <!-- Java version config -->
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <!-- Dependencies (libraries you use) -->
     <dependencies>
 
-        <!-- Logging API (what your code uses) -->
+        <!-- Logging API -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>2.0.12</version>
         </dependency>
 
-        <!-- Logging implementation (actually prints logs) -->
+        <!-- Logging implementation -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.4.14</version>
         </dependency>
 
-        <!-- Testing framework -->
+        <!-- JUnit 5 -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.10.2</version>
-            <scope>test</scope> <!-- only used for tests -->
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Mockito - for mocking dependencies in tests -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>5.11.0</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
 
-    <!-- Build configuration -->
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
+
+        <!-- tell Maven where test resources are -->
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+            </testResource>
+        </testResources>
+
         <plugins>
 
-            <!-- Java compiler plugin -->
+            <!-- Java compiler -->
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.11.0</version>
             </plugin>
 
-            <!-- Runs unit tests -->
+            <!-- Test runner -->
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
+                <configuration>
+                    <!-- output test logs to target/test-logs -->
+                    <reportsDirectory>${project.build.directory}/test-logs</reportsDirectory>
+                    <systemPropertyVariables>
+                        <logback.configurationFile>src/test/resources/logback-test.xml</logback.configurationFile>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
 
         </plugins>

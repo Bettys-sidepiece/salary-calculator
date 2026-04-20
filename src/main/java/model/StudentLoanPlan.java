@@ -2,6 +2,9 @@ package model;
 
 import java.math.BigDecimal;
 
+/**
+ * Enum representing different student loan plans.
+ */
 public enum StudentLoanPlan{
     NONE(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO),
     PLAN1(BigDecimal.valueOf(22015), BigDecimal.valueOf(0.09), BigDecimal.ZERO, BigDecimal.ZERO),
@@ -15,6 +18,14 @@ public enum StudentLoanPlan{
     private final BigDecimal fixedRepayment;
     private final BigDecimal interestRate;
 
+    /**
+     * Constructs a StudentLoanPlan with the specified parameters.
+     *
+     * @param threshold the income threshold for repayment
+     * @param rate the repayment rate
+     * @param fixedRepayment the fixed repayment amount
+     * @param interestRate the interest rate
+     */
     StudentLoanPlan(BigDecimal threshold, 
     BigDecimal rate, BigDecimal fixedRepayment, BigDecimal interestRate) {
 

@@ -1,12 +1,13 @@
 package tax;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static util.MoneyUtils.scale;
 /**
  * Represents a UK Tax Year with full tax policy:
  * - Personal allowance (with taper)
@@ -33,14 +34,14 @@ public final class TaxYear {
      */
     public static TaxYear uk2026() {
         return new TaxYear(
-            bd(12570),
-            bd(50270),
-            bd(125140),
-            bd("0.20"),
-            bd("0.40"),
-            bd("0.45"),
-            bd(100000),
-            bd("0.50")
+            BigDecimal.valueOf(12570),
+            BigDecimal.valueOf(50270),
+            BigDecimal.valueOf(125140),
+            BigDecimal.valueOf(0.20),
+            BigDecimal.valueOf(0.40),
+            BigDecimal.valueOf(0.45),
+            BigDecimal.valueOf(100000),
+            BigDecimal.valueOf(0.50)
         );
     }
 
@@ -83,7 +84,8 @@ public final class TaxYear {
      */
     public BigDecimal calculatePersonalAllowance(BigDecimal adjustedIncome) {
         Objects.requireNonNull(adjustedIncome, "Adjusted income cannot be null");
-
+        requireNonNegative(adjustedIncome, "adjusted income");
+        
         if (adjustedIncome.compareTo(allowanceWithdrawalThreshold) <= 0) {
             logger.debug("Income {} below withdrawal threshold, using full allowance: {}", 
                 adjustedIncome, personalAllowance);
@@ -102,7 +104,7 @@ public final class TaxYear {
     }
 
     /**
-     * Returns ordered income tax bands.
+     * Returns a list of tax bands for this tax year.
      */
     public List<TaxBand> getIncomeTaxBands() {
         logger.debug("Generating tax bands - Basic: {}%, Higher: {}%, Additional: {}%",
@@ -152,7 +154,12 @@ public final class TaxYear {
     // ------------------------
     // Helpers
     // ------------------------
-
+    /**
+     * Validates that a BigDecimal value is non-negative and not null.
+     * @param value the value to check
+     * @param name the name of the value (for error messages)
+     * @return the validated value
+     */
     private static BigDecimal requireNonNegative(BigDecimal value, String name) {
         Objects.requireNonNull(value, name + " cannot be null");
         if (value.compareTo(BigDecimal.ZERO) < 0) {
@@ -160,7 +167,12 @@ public final class TaxYear {
         }
         return value;
     }
-
+    /**
+     * Validates that a BigDecimal value is a valid rate between 0 and 1, and not null.
+     * @param value the value to check
+     * @param name the name of the value (for error messages)
+     * @return the validated value
+     */
     private static BigDecimal requireRate(BigDecimal value, String name) {
         Objects.requireNonNull(value, name + " cannot be null");
         if (value.compareTo(BigDecimal.ZERO) < 0 || value.compareTo(BigDecimal.ONE) > 0) {
@@ -169,15 +181,4 @@ public final class TaxYear {
         return value;
     }
 
-    private static BigDecimal bd(double value) {
-        return BigDecimal.valueOf(value);
-    }
-
-    private static BigDecimal bd(String value) {
-        return new BigDecimal(value);
-    }
-
-    private static BigDecimal scale(BigDecimal value) {
-        return value.setScale(2, RoundingMode.HALF_UP);
-    }
 }

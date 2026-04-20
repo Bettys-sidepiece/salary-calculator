@@ -5,6 +5,7 @@
 package tax;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 
 import org.slf4j.Logger;
@@ -34,7 +35,9 @@ public class UKTaxStrategy implements TaxStrategy {
         
         // Calculate allowance after withdrawal threshold
         BigDecimal allowanceUsed = calculateAllowanceAfterWithdrawal(gross);
-        BigDecimal effectiveTaxableIncome = MoneyUtils.scale(gross.subtract(allowanceUsed));
+        BigDecimal allowanceRemaining = taxYear.getPersonalAllowance().subtract(allowanceUsed);
+        BigDecimal effectiveTaxableIncome = MoneyUtils.scale(
+            gross.subtract(preTax).subtract(allowanceUsed));
         
         BigDecimal incomeTax = calculateIncomeTax(effectiveTaxableIncome);
         BigDecimal ni = calculateNationalInsurance(gross);
@@ -43,16 +46,24 @@ public class UKTaxStrategy implements TaxStrategy {
         BigDecimal netAnnual = MoneyUtils.scale(gross.subtract(totalDeductions));
         
         BigDecimal effectiveTaxRate = MoneyUtils.scale(
-            incomeTax.add(ni).divide(gross, BigDecimal.ROUND_HALF_UP)
+            incomeTax.add(ni).divide(gross, 2,RoundingMode.HALF_UP)
         );
         
         logger.info("Tax calculated - Allowance used: {}, Income tax: {}, NI: {}, Student loan: {}", 
             allowanceUsed, incomeTax, ni, studentLoan);
         
-        return new TaxBreakdown(gross, incomeTax, ni, studentLoan, netAnnual, 
-            totalDeductions, preTax, taxableIncome, 
+        return new TaxBreakdown(
+            gross,
+            incomeTax, 
+            ni, 
+            studentLoan, 
+            netAnnual, 
+            totalDeductions, 
+            preTax, 
+            taxableIncome, 
             taxYear.getPersonalAllowance(), 
-            BigDecimal.ZERO, effectiveTaxRate);
+            allowanceRemaining, 
+            effectiveTaxRate);
     }
 
     private BigDecimal calculateAllowanceAfterWithdrawal(BigDecimal gross) {
@@ -82,8 +93,10 @@ public class UKTaxStrategy implements TaxStrategy {
         }
         
         BigDecimal tax = BigDecimal.ZERO;
-        BigDecimal basicRateLimit = taxYear.getBasicRateLimit();
-        BigDecimal higherRateLimit = taxYear.getHigherRateLimit();
+        BigDecimal basicRateLimit = taxYear.getBasicRateLimit()
+            .subtract(taxYear.getPersonalAllowance());
+        BigDecimal higherRateLimit = taxYear.getHigherRateLimit()
+            .subtract(taxYear.getPersonalAllowance());
         
         // Basic rate (20%)
         if (taxableIncome.compareTo(basicRateLimit) <= 0) {

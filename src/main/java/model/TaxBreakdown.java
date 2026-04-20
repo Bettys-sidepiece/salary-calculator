@@ -50,6 +50,7 @@ public final class TaxBreakdown {
         BigDecimal taxFreeAllowanceRemaining,
         BigDecimal effectiveTaxRate) {
 
+            // Validate inputs
             Objects.requireNonNull(grossAnnual, "Gross annual income cannot be null");
             Objects.requireNonNull(incomeTax, "Income tax cannot be null");
             Objects.requireNonNull(nationalInsurance, "National insurance cannot be null");
@@ -62,6 +63,7 @@ public final class TaxBreakdown {
             Objects.requireNonNull(taxFreeAllowanceRemaining, "Tax free allowance remaining cannot be null");
             Objects.requireNonNull(effectiveTaxRate, "Effective tax rate cannot be null");
 
+            // Validate values
             if (grossAnnual.compareTo(BigDecimal.ZERO) <= 0) {
                 throw new IllegalArgumentException("Gross annual income must be positive");
             }
@@ -78,13 +80,13 @@ public final class TaxBreakdown {
                 throw new IllegalArgumentException("Net annual income cannot be negative");
             }
             if (pensionContribution.compareTo(BigDecimal.ZERO) < 0){
-                throw new IllegalArgumentException("Pension Contribition must be 0.0 or greater");
+                throw new IllegalArgumentException("Pension contribition must be 0.0 or greater");
             }
             if (pensionContribution.compareTo(grossAnnual) > 0){
-                throw new IllegalArgumentException("Pension Contribition can not be greater than GrossAnnual");
+                throw new IllegalArgumentException("Pension contribition can not be greater than GrossAnnual");
             }
 
-            if (totalDeductions.add(incomeTax).add(nationalInsurance).add(studentLoanRepayment).add(pensionContribution).compareTo(grossAnnual) > 0) {
+            if(totalDeductions.compareTo(grossAnnual) > 0){
                 throw new IllegalArgumentException("Total deductions cannot exceed gross annual income");
             }
 
@@ -118,7 +120,8 @@ public final class TaxBreakdown {
                         .compareTo(netAnnual) != 0){
                 throw new IllegalArgumentException("Net annual income must be equal to gross annual income minus deductions");
             }
-        
+            
+            // Assign values with scaling
             this.grossAnnual = MoneyUtils.scale(grossAnnual);
             this.basictax = MoneyUtils.scale(incomeTax);
             this.nationalInsurance = MoneyUtils.scale(nationalInsurance);
@@ -133,50 +136,103 @@ public final class TaxBreakdown {
             this.effectiveTaxRate = MoneyUtils.scale(effectiveTaxRate);
     }
 
+    /* Getters */
+
+    /**
+     * Returns the gross annual income.
+     *
+     * @return the gross annual income
+     */
     public BigDecimal getGrossAnnual(){
         return grossAnnual;
     }
-
+    /**
+    * Returns the basic income tax amount.
+    *
+    * @return the basic income tax amount
+    */    
     public BigDecimal getBasicTax(){
         return basictax;
     }
-
+    /**
+     * Returns the national insurance amount.
+     *
+     * @return the national insurance amount
+     */
     public BigDecimal getNationalInsurance(){
         return nationalInsurance;
     }
 
+    /**
+     * Returns the student loan repayment amount.
+     *
+     * @return the student loan repayment amount
+     */
     public BigDecimal getStudentLoanRepayment(){
         return studentLoanRepayment;
     }
 
+    /**
+     * Returns the net annual income.
+     *
+     * @return the net annual income
+     */
     public BigDecimal getNetAnnual(){
         return netAnnual;
     }
-
+    /**
+     * Returns the pension contribution amount.
+     *
+     * @return the pension contribution amount
+     */
     public BigDecimal getPensionContribution(){
         return pensionContribution;
     }
-
+    /**
+     * Returns the taxable income amount.
+     *
+     * @return the taxable income amount
+     */
     public BigDecimal getTaxableIncome(){
         return taxableIncome;
     }
-
+    /**
+     * Returns the tax free allowance amount.
+     *
+     * @return the tax free allowance amount
+     */
     public BigDecimal getTaxFreeAllowance(){
         return taxFreeAllowance;
     }
-
+    /**
+     * Returns the amount of tax free allowance used.
+     *
+     * @return the amount of tax free allowance used
+     */
     public BigDecimal getTaxFreeAllowanceUsed(){
         return taxFreeAllowanceUsed;
     }
-
+    /**
+     * Returns the amount of tax free allowance remaining.
+     *
+     * @return the amount of tax free allowance remaining
+     */
     public BigDecimal getTaxFreeAllowanceRemaining(){
         return taxFreeAllowanceRemaining;
     }
-
+    /**
+     * Returns the effective tax rate as a decimal (e.g., 0.25 for 25%).
+     *
+     * @return the effective tax rate
+     */
     public BigDecimal getEffectiveTaxRate(){
         return effectiveTaxRate;
     }
-
+    /**
+     * Returns the total deductions amount.
+     *
+     * @return the total deductions amount
+     */
     public BigDecimal getTotalDeductions(){
         return totalDeductions;
     }
