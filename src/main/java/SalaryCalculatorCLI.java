@@ -1,7 +1,9 @@
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Scanner;
 
 import model.IncomeProfile;
+import model.PreTaxDeduction;
 import model.StudentLoanPlan;
 import model.TaxBreakdown;
 import tax.TaxYear;
@@ -17,8 +19,16 @@ public class SalaryCalculatorCLI {
         System.out.print("Enter gross annual salary (£): ");
         BigDecimal gross = new BigDecimal(scanner.nextLine().trim());
 
-        System.out.print("Enter pre-tax deductions e.g. pension (£, or 0): ");
-        BigDecimal preTax = new BigDecimal(scanner.nextLine().trim());
+        System.out.print("Enter pension contribution (% of salary, or 0): ");
+        BigDecimal pensionPct = new BigDecimal(scanner.nextLine().trim());
+
+        List<PreTaxDeduction> deductions = pensionPct.compareTo(BigDecimal.ZERO) > 0
+            ? List.of(new PreTaxDeduction(
+                "Pension",
+                PreTaxDeduction.Type.PENSION,
+                PreTaxDeduction.Mode.PERCENTAGE,
+                pensionPct.divide(BigDecimal.valueOf(100))))
+            : List.of();
 
         System.out.println("Select student loan plan:");
         for (StudentLoanPlan plan : StudentLoanPlan.values()) {
@@ -27,7 +37,7 @@ public class SalaryCalculatorCLI {
         System.out.print("Enter plan: ");
         StudentLoanPlan plan = StudentLoanPlan.valueOf(scanner.nextLine().trim().toUpperCase());
 
-        IncomeProfile profile = new IncomeProfile(gross, preTax, plan, TaxYear.uk2026());
+        IncomeProfile profile = new IncomeProfile(gross, deductions, plan, TaxYear.uk2026());
         UKTaxStrategy strategy = new UKTaxStrategy(TaxYear.uk2026());
         TaxBreakdown breakdown = strategy.calculateTax(profile);
 

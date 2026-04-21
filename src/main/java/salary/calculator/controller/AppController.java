@@ -2,6 +2,8 @@ package salary.calculator.controller;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Collections;
+import java.util.List;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import model.IncomeProfile;
 import model.PayPeriod;
+import model.PreTaxDeduction;
 import model.StudentLoanPlan;
 import model.TaxBreakdown;
 import salary.calculator.api.AppRequest;
@@ -37,10 +40,20 @@ public class AppController {
     public AppResponse calculate(@RequestBody AppRequest request) {
         // Validate input and call the service to perform calculations
         TaxYear taxYear = taxYearService.getByLabel(request.getTaxYear());
-
+        List<PreTaxDeduction> deductions = request.getDeductions() == null
+            ? Collections.emptyList()
+            : request.getDeductions().stream()
+                .map(d -> new PreTaxDeduction(
+                    d.getLabel(),
+                    PreTaxDeduction.Type.valueOf(d.getType().toUpperCase()),
+                    PreTaxDeduction.Mode.valueOf(d.getMode().toUpperCase()),
+                    d.getValue()
+                ))
+                .toList();
+        
         IncomeProfile profile = new IncomeProfile(
             request.getGrossSalary(), // Passes gross salary from the request to the profile
-            request.getPreTaxDeductions(), //Passes pre-tax deductions to the profile from the request
+            deductions, //Passes pre-tax deductions to the profile from the request
             StudentLoanPlan.valueOf(request.getStudentLoanPlan().toUpperCase()), // Passes student loan plan from the request to the profile, converting it to uppercase for enum matching
             taxYear // Passes the retrieved TaxYear to the profile for tax calculations
         );
@@ -76,6 +89,11 @@ public class AppController {
         response.setNationalInsurance(breakdown.getNationalInsurance());
         response.setStudentLoanRepayment(breakdown.getStudentLoanRepayment());
         response.setPensionContribution(breakdown.getPensionContribution());
+        response.setSalarySacrifice(breakdown.getSalarySacrifice());
+        response.setGiftAid(breakdown.getGiftAid());
+        response.setProfessionalSubscription(breakdown.getProfessionalSubscriptions());
+        response.setOther(breakdown.getOtherPreTaxDeductions());
+        response.setTotalPreTaxDeductions(breakdown.getTotalPreTaxDeductions());
         response.setTotalDeductions(breakdown.getTotalDeductions());
         response.setNetAnnual(breakdown.getNetAnnual());
         response.setEffectiveTaxRate(breakdown.getEffectiveTaxRate());

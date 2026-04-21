@@ -2,23 +2,49 @@ package salary.calculator.api;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+
 public class AppResponse {
 
     // ── Annual figures ───────────────────────────────
+    @JsonSerialize(using = ToStringSerializer.class)
     private BigDecimal grossAnnual;
+    @JsonSerialize(using = ToStringSerializer.class)
     private BigDecimal taxFreeAllowance;
+    @JsonSerialize(using = ToStringSerializer.class)
     private BigDecimal taxableIncome;
+    @JsonSerialize(using = ToStringSerializer.class)
     private BigDecimal incomeTax;
+    @JsonSerialize(using = ToStringSerializer.class)
     private BigDecimal nationalInsurance;
+    @JsonSerialize(using = ToStringSerializer.class)
     private BigDecimal studentLoanRepayment;
+    @JsonSerialize(using = ToStringSerializer.class)
     private BigDecimal pensionContribution;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private BigDecimal salarySacrifice;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private BigDecimal giftAid;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private BigDecimal professionalSubscription;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private BigDecimal other;
+    @JsonSerialize(using = ToStringSerializer.class)
+    private BigDecimal totalPreTaxDeductions;
+    @JsonSerialize(using = ToStringSerializer.class)
     private BigDecimal totalDeductions;
+    @JsonSerialize(using = ToStringSerializer.class)
     private BigDecimal netAnnual;
+    @JsonSerialize(using = ToStringSerializer.class)
     private BigDecimal effectiveTaxRate;
 
     // ── Pay period figures ─────────────────────────────
+    @JsonSerialize(using = ToStringSerializer.class)
     private BigDecimal grossPerPeriod;
+    @JsonSerialize(using = ToStringSerializer.class)
     private BigDecimal netPerPeriod;
+    @JsonSerialize(using = ToStringSerializer.class)
     private String payPeriod;
 
     // ── Getters and Setters ─────────────────────────────
@@ -42,6 +68,21 @@ public class AppResponse {
 
     public BigDecimal getPensionContribution() { return pensionContribution; }
     public void setPensionContribution(BigDecimal pensionContribution) { this.pensionContribution = pensionContribution; }
+
+    public BigDecimal getSalarySacrifice() { return salarySacrifice; }
+    public void setSalarySacrifice(BigDecimal salarySacrifice) { this.salarySacrifice = salarySacrifice; }
+
+    public BigDecimal getGiftAid() { return giftAid; }
+    public void setGiftAid(BigDecimal giftAid) { this.giftAid = giftAid; }
+
+    public BigDecimal getProfessionalSubscription() { return professionalSubscription; }
+    public void setProfessionalSubscription(BigDecimal professionalSubscription) { this.professionalSubscription = professionalSubscription; }
+
+    public BigDecimal getOther() { return other; }
+    public void setOther(BigDecimal other) { this.other = other; }
+
+    public BigDecimal getTotalPreTaxDeductions() { return totalPreTaxDeductions; }
+    public void setTotalPreTaxDeductions(BigDecimal totalPreTaxDeductions) { this.totalPreTaxDeductions = totalPreTaxDeductions; }
 
     public BigDecimal getTotalDeductions() { return totalDeductions; }
     public void setTotalDeductions(BigDecimal totalDeductions) { this.totalDeductions = totalDeductions; }

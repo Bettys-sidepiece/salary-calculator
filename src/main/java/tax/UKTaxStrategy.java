@@ -37,12 +37,44 @@ public class UKTaxStrategy implements TaxStrategy {
         logger.debug("Starting tax calculation for gross: {}", profile.getGrossAnnual());
         
         BigDecimal gross = profile.getGrossAnnual();
-        BigDecimal preTax = profile.getPreTaxDeductions();
-        BigDecimal taxableIncome = MoneyUtils.scale(gross.subtract(preTax));
+
+        BigDecimal pension = profile.getDeductions().stream()
+            .filter(d->d.getType() == model.PreTaxDeduction.Type.PENSION)
+            .map(d -> d.resolve(gross))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+            
+        BigDecimal salarySacrifice = profile.getDeductions().stream()
+            .filter(d->d.getType() == model.PreTaxDeduction.Type.SALARY_SACRIFICE)
+            .map(d -> d.resolve(gross))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal giftAid = profile.getDeductions().stream()
+            .filter(d->d.getType() == model.PreTaxDeduction.Type.GIFT_AID)
+            .map(d -> d.resolve(gross))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal professionalSubscription = profile.getDeductions().stream()
+            .filter(d->d.getType() == model.PreTaxDeduction.Type.PROFESSIONAL_SUBSCRIPTION)
+            .map(d -> d.resolve(gross))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        BigDecimal other = profile.getDeductions().stream()
+            .filter(d->d.getType() == model.PreTaxDeduction.Type.OTHER)
+            .map(d -> d.resolve(gross))
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal preTax = MoneyUtils.scale(pension
+            .add(salarySacrifice)
+            .add(giftAid)
+            .add(professionalSubscription)
+            .add(other)
+        );
+
+        BigDecimal taxableIncome = MoneyUtils.scale(gross.subtract(preTax)); //EQ: Gross - pre-tax deductions (before allowance)
         
         // Calculate allowance after withdrawal threshold
         BigDecimal allowanceUsed = calculateAllowanceAfterWithdrawal(gross);
-        BigDecimal allowanceRemaining = taxYear.getPersonalAllowance().subtract(allowanceUsed);
+        BigDecimal allowanceRemaining = taxYear.getPersonalAllowance().subtract(allowanceUsed); // 
         BigDecimal effectiveTaxableIncome = MoneyUtils.scale(
             gross.subtract(preTax).subtract(allowanceUsed));
         
@@ -66,7 +98,11 @@ public class UKTaxStrategy implements TaxStrategy {
             studentLoan, 
             netAnnual, 
             totalDeductions, 
-            preTax, 
+            pension, 
+            salarySacrifice, 
+            giftAid, 
+            professionalSubscription, 
+            other, 
             taxableIncome, 
             taxYear.getPersonalAllowance(), 
             allowanceRemaining, 

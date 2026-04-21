@@ -6,15 +6,6 @@ This project is built as a **core domain application**, with future plans to int
 
 ---
 
-## 🎯 Purpose
-
-* Practice object-oriented design (OOP)
-* Build a layered architecture
-* Handle financial calculations correctly using `BigDecimal`
-* Design a system that can scale into a backend service
-
----
-
 ## 🧱 Project Structure
 
 ```
@@ -42,61 +33,16 @@ TaxBreakdown (output model)
 
 ---
 
-## ⚙️ Tech Stack
+## Tech Stack
 
 * Java 17
 * Maven
 * SLF4J + Logback (logging)
 * JUnit (testing)
-
-> Spring Boot integration is planned for future backend/API development.
-
----
-
-## 🚀 Getting Started
-
-### Compile
-
-```
-mvn compile
-```
-
-### Run tests
-
-```
-mvn test
-```
+* SpringBoot
 
 ---
 
-## 📌 Current Status
-
-* [x] Project setup (Maven, structure, logging)
-* [ ] IncomeProfile model
-* [ ] Validation logic
-* [ ] Tax strategy implementation
-* [ ] CLI interface
-
----
-
-## 🧠 Key Design Principles
-
-* Immutable domain models
-* Separation of concerns
-* Strategy pattern for tax systems
-* Single source of truth (annual salary)
-
----
-
-## 🔮 Future Improvements
-
-* Spring Boot REST API
-* Config-driven tax bands
-* Multiple tax jurisdictions
-* Web-based UI
-
----
-
-## 📄 License
+## License
 
 MIT License
