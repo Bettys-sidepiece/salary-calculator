@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TaxYearRepo extends JpaRepository<TaxYearEntity, Long> {
     Optional<TaxYearEntity> findByLabel(String label);
+    Optional<TaxYearEntity> findFirstByOrderByLabelDesc();
 }

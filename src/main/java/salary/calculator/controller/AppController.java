@@ -4,7 +4,10 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +18,7 @@ import model.PayPeriod;
 import model.PreTaxDeduction;
 import model.StudentLoanPlan;
 import model.TaxBreakdown;
+import repo.TaxYearEntity;
 import salary.calculator.api.AppRequest;
 import salary.calculator.api.AppResponse;
 import salary.calculator.service.TaxYearService;
@@ -23,6 +27,7 @@ import tax.UKTaxStrategy;
 
 @RestController
 @RequestMapping("/api/salary")
+@CrossOrigin(origins = "http://localhost:3000") // TODO: Update this in production to match your frontend URL
 /**
  * Controller class for handling salary calculation requests. 
  * This class will define endpoints for retrieving tax year information
@@ -36,7 +41,15 @@ public class AppController {
         this.taxYearService = taxYearService;
     }
 
+    @GetMapping("/tax-year/current")
+    @CrossOrigin(origins = "http://localhost:3000")
+    public Map<String, String> getCurrentTaxYear() {
+        TaxYearEntity entity = taxYearService.getTaxYearEntityMostRecent();
+        return Map.of("label", entity.getLabel());
+    }
+
     @PostMapping("/calculate")
+    @CrossOrigin(origins = "http://localhost:3000")
     public AppResponse calculate(@RequestBody AppRequest request) {
         // Validate input and call the service to perform calculations
         TaxYear taxYear = taxYearService.getByLabel(request.getTaxYear());

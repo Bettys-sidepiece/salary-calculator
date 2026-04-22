@@ -42,4 +42,20 @@ public class TaxYearService {
             entity.getAllowanceWithdrawalRate()
         );
     }
+
+    /**
+     * Retrieves the most recent tax year (ordered by label descending)
+     * @return the TaxYear with the highest label (most recent)
+     */
+    public TaxYear findMostRecent() {
+        TaxYearEntity entity = taxYearRepo.findFirstByOrderByLabelDesc()
+            .orElseThrow(() -> new IllegalArgumentException("No tax years found in database"));
+        
+        return mapToTaxYear(entity);
+    }
+
+    public TaxYearEntity getTaxYearEntityMostRecent() {
+        return taxYearRepo.findFirstByOrderByLabelDesc()
+            .orElseThrow(() -> new IllegalArgumentException("No tax years found in database"));
+    }
 }

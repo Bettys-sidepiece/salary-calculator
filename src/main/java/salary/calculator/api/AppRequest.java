@@ -5,7 +5,7 @@ import java.util.List;
 
 public class AppRequest {
     private BigDecimal grossSalary;
-    private String taxYear;
+    private String taxYear; //format "2023/24"
     private String studentLoanPlan;
     private List<DeductionRequest> deductions;
     private BigDecimal hoursPerWeek;
@@ -30,7 +30,7 @@ public class AppRequest {
 
     public BigDecimal getGrossSalary() { return grossSalary; }
     public void setGrossSalary(BigDecimal grossSalary) { this.grossSalary = grossSalary; }
-    public String getTaxYear() { return taxYear; }
+    public String getTaxYear() { return taxYear; } // Getter for taxYear
     public void setTaxYear(String taxYear) { this.taxYear = taxYear; }
     public String getStudentLoanPlan() { return studentLoanPlan; }
     public void setStudentLoanPlan(String studentLoanPlan) { this.studentLoanPlan = studentLoanPlan; }
