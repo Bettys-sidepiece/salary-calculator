@@ -1,45 +1,219 @@
-# Salary Calculator (Java)
+# Salary Calculator
 
-A Java 17 salary calculator designed to explore clean architecture, object-oriented design, and financial modelling.
-
-This project is built as a **core domain application**, with future plans to integrate into a Spring Boot backend.
+A full-stack UK salary calculator with a Spring Boot REST API backend and Next.js frontend. Demonstrates clean architecture, object-oriented design, and financial modelling with tax calculations, student loan handling, and deduction management.
 
 ---
 
-## 🧱 Project Structure
+## Features
+
+- **Accurate UK Tax Calculations** - Handles income tax, National Insurance contributions, and student loans
+- **Flexible Deductions** - Support for pensions, salary sacrifice, gift aid, and custom deductions
+- **Tax Year Management** - Multiple tax year configurations stored in database
+- **Modern UI** - Responsive Next.js frontend with Tailwind CSS
+- **RESTful API** - Spring Boot backend with PostgreSQL persistence
+- **Clean Architecture** - Separation of concerns with service layer, tax strategies, and domain models
+
+---
+
+## Architecture
 
 ```
-src/main/java/
-├── model/      # Domain objects (IncomeProfile, TaxBreakdown, enums)
-├── service/    # Orchestration logic
-├── tax/        # Tax calculation strategies
-├── ui/         # CLI interface
-└── SalaryCalculatorApp.java  # Main entry point
+Frontend (Next.js/React)           Backend (Spring Boot)              Database
+    ↓                                    ↓                                 ↓
+SalaryForm.tsx  ────────────→  AppController ─────────────→  PostgreSQL
+                              ↓
+                    TaxYearService
+                              ↓
+                    UKTaxStrategy + Tax Calculations
+                              ↓
+                    TaxBreakdown (Output Model)
 ```
 
 ---
 
-## 🧠 Architecture Overview
+## Project Structure
 
 ```
-IncomeProfile (input model)
-        ↓
-SalaryService (orchestration)
-        ↓
-TaxStrategy (calculation logic)
-        ↓
-TaxBreakdown (output model)
+salary-calculator/
+├── frontend/                       # Next.js React frontend
+│   ├── app/                       # Next.js app directory
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── src/
+│   │   ├── components/            # React components
+│   │   │   └── SalaryForm.tsx
+│   │   ├── services/
+│   │   │   └── api.ts            # API client
+│   │   └── types/
+│   │       └── index.ts          # TypeScript types
+│   ├── package.json
+│   ├── tailwind.config.mjs
+│   └── next.config.ts
+│
+├── src/main/java/
+│   └── salary/
+│       ├── calculator/            # Main application layer
+│       │   ├── controller/        # REST endpoints
+│       │   ├── service/           # Business logic
+│       │   └── api/               # Request/response models
+│       ├── model/                 # Domain models
+│       │   ├── IncomeProfile.java
+│       │   ├── TaxBreakdown.java
+│       │   ├── PayPeriod.java
+│       │   └── StudentLoanPlan.java
+│       ├── tax/                   # Tax calculation strategies
+│       │   ├── TaxYear.java
+│       │   ├── UKTaxStrategy.java
+│       │   └── TaxBand.java
+│       ├── repo/                  # Database access layer
+│       │   ├── TaxYearRepo.java
+│       │   └── TaxYearEntity.java
+│       └── util/                  # Utilities
+│           └── MoneyUtils.java
+│
+├── src/test/java/                 # Unit tests
+│   ├── tax/
+│   ├── util/
+│   └── service/
+│
+├── src/main/resources/
+│   ├── db/
+│   │   ├── schema.sql            # Database schema
+│   │   └── seed.sql              # Initial data
+│   ├── application.properties    # Configuration
+│   └── logback.xml               # Logging config
+│
+├── pom.xml                        # Maven dependencies
+└── README                         # This file
 ```
 
 ---
 
 ## Tech Stack
 
-* Java 17
-* Maven
-* SLF4J + Logback (logging)
-* JUnit (testing)
-* SpringBoot
+### Backend
+- **Java 17** - Language
+- **Spring Boot 3.2.5** - Framework
+- **Spring Data JPA** - ORM
+- **PostgreSQL** - Database
+- **Maven** - Build tool
+- **SLF4J + Logback** - Logging
+- **JUnit** - Testing
+
+### Frontend
+- **Next.js 16.2.4** - React framework
+- **React 19.2.4** - UI library
+- **TypeScript 5** - Type safety
+- **Tailwind CSS 4** - Styling
+- **ESLint 9** - Code linting
+
+---
+
+## Getting Started
+
+### Prerequisites
+- Java 17+
+- Maven 3.6+
+- Node.js 18+ & npm
+- PostgreSQL 12+
+
+### Backend Setup
+
+1. **Configure Database Connection**
+   ```bash
+   export DB_URL=jdbc:postgresql://localhost:5432/salary_calculator
+   export DB_USERNAME=postgres
+   export DB_PASSWORD=your_password
+   ```
+
+2. **Build the Project**
+   ```bash
+   mvn clean install
+   ```
+
+3. **Run the Backend**
+   ```bash
+   mvn spring-boot:run
+   ```
+   The API will start at `http://localhost:8080`
+
+### Frontend Setup
+
+1. **Navigate to Frontend Directory**
+   ```bash
+   cd frontend
+   ```
+
+2. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Run Development Server**
+   ```bash
+   npm run dev
+   ```
+   The frontend will be available at `http://localhost:3000`
+
+---
+
+## API Endpoints
+
+### Tax Year Endpoints
+- `GET /api/salary/tax-year/current` - Get the most recent tax year configuration
+
+### Salary Calculation Endpoints
+- `POST /api/salary/calculate` - Calculate salary breakdown (primary endpoint)
+
+### Request Example
+```json
+{
+  "grossSalary": 50000,
+  "taxYear": "2024/25",
+  "studentLoanPlan": "PLAN_2",
+  "payPeriod": "MONTHLY",
+  "hoursPerWeek": 40,
+  "workingDaysPerWeek": 5,
+  "deductions": [
+    {
+      "label": "Pension Contribution",
+      "type": "PENSION",
+      "mode": "PERCENTAGE",
+      "value": 5
+    }
+  ]
+}
+```
+
+---
+
+## Database
+
+The application uses PostgreSQL with automated schema initialization:
+
+- **Schema Initialization** - Runs on startup from `src/main/resources/db/schema.sql`
+- **Seed Data** - Loads initial tax year data from `src/main/resources/db/seed.sql`
+- **Tax Years** - Stores multiple tax year configurations with tax bands and thresholds
+
+---
+
+## Testing
+
+Run the test suite:
+```bash
+mvn test
+```
+
+Current test coverage:
+- `UKTaxStrategyTest` - Tax calculation logic
+- `TaxYearTest` - Tax year model
+- `MoneyUtilsTest` - Financial utilities
+
+---
+
+## CORS Configuration
+
+The backend is configured to accept requests from `http://localhost:3000` during development. Update `AppController` for production deployments.
 
 ---
 
